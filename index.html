@@ -310,12 +310,27 @@ const audioManager = {
     },
     bgmAudio: null,
 
+    init() {
+        console.log("Audio Init: Warming up cache...");
+        Object.keys(this.sounds).forEach(key => {
+            const a = new Audio(this.sounds[key]);
+            a.volume = 0;
+            a.load(); 
+        });
+    },
+
     play(key) {
+        if (!this.sounds[key]) return;
+
         try {
-            if (this.sounds[key]) {
-                const audio = new Audio(this.sounds[key]);
-                audio.volume = 0.8; 
-                audio.play().catch(e => console.log("SFX Play Blocked", e));
+            const sound = new Audio(this.sounds[key]);
+            sound.volume = 0.8;
+
+            const playPromise = sound.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // console.log("Audio blocked (user interaction needed):", error);
+                });
             }
         } catch (e) {
             console.error("Audio Error:", e);
@@ -403,7 +418,22 @@ const aiManager = {
         const topicNames = TOPICS_LIST.filter(t => topics.includes(t.id)).map(t => t.name).join(", ");
         
         let diffInstruction = difficulty;
-        if (difficulty === "RE:Hard") diffInstruction = "EXTREME DIFFICULTY. Edge cases.";
+        if (difficulty === "RE:Hard") {
+            diffInstruction = `Higher than HKDSE Level 5** standard. 
+            1. Focus on complex scenario-based applications rather than factual recall. 
+            2. Incorporate logical traps, edge cases, and cross-topic integration. 
+            3. For MC: All distractors must be highly plausible, based on common student misconceptions. 
+            4. For Algorithms: Focus on dry-running complex loops, boundary conditions, and efficiency analysis. 
+            5. For Networking/DB: Focus on protocol nuances, normalization conflicts, and advanced security logic.`;
+        }
+
+        const seenArray = Array.from(game.seenQuestions);
+        const historyContext = seenArray.slice(-90); 
+        
+        let avoidInstruction = "";
+        if (historyContext.length > 0) {
+            avoidInstruction = `IMPORTANT: DO NOT generate the following questions again (Duplicates Forbidden): ${JSON.stringify(historyContext)}. Generate completely NEW questions.`;
+        }
 
         const systemPrompt = `You are a HKDSE ICT Exam Constructor.
         Generate a JSON array of ${count} DISTINCT questions about: ${topicNames}.
@@ -411,6 +441,7 @@ const aiManager = {
         Types: ${types.join(", ")}.
         Language: Traditional Chinese (HK terminology).
         Format: {"questions": [{"type": "MC" or "SHORT", "question": "...", "options": ["A", "B", "C", "D"], "answer": "...", "rationale": "..."}]}
+        ${avoidInstruction}
         RETURN JSON ONLY.`;
 
         try {
@@ -512,10 +543,16 @@ const aiManager = {
 
     async generateSummaryReport(mistakes) {
         if (!navigator.onLine) return "System Offline. Tactical report unavailable.";
-        if (mistakes.length === 0) return "No errors detected. Perfect run! System integrity 100%.";
+        if (mistakes.length === 0) return "咁勁？！犀利喎👍👍👍";
         
         const mistakesText = mistakes.slice(0, 5).map(m => `- Q: ${m.question.substring(0,20)}... | Ans: ${m.correct}`).join("\n");
-        const prompt = `Analyze mistakes: ${mistakesText}. Write a 50-word encouraging tactical debrief in Traditional Chinese(Contonese).`;
+
+        let prompt = "";
+        if (game.state.settings.diff !== "RE:Hard") {
+            prompt = `Analyze mistakes: ${mistakesText}. Write a encouraging tactical debrief in Traditional Chinese (Cantonese).Max 500 words.`;
+        } else {
+            prompt = `Analyze mistakes: ${mistakesText}. Write a harsh, brutal, critical style tactical debrief in Traditional Chinese (Cantonese).Max 500 words.`;
+        }
 
         try {
             const data = await this.fetchAI("ICT Teacher", prompt, false);
@@ -589,7 +626,7 @@ const game = {
                         txt.innerText = texts[Math.floor(Math.random() * texts.length)];
                     }
                 }
-            }, 400);
+            }, 600);
         } else {
             clearInterval(this.loadingInterval);
             bar.style.width = "100%";
@@ -641,13 +678,14 @@ const game = {
         }, 800)
     },
 
-    startGame: function(topics, types, diff, maxLv) {
+startGame: function(topics, types, diff, maxLv) {
         this.state = {
             hp: 100, score: 0, level: 1, combo: 0, maxLevels: maxLv,
             settings: { topics, types, diff },
             monster: this.spawnMonster(1, diff),
             isOver: false,
             mistakes: [],
+            totalQ: 0,
             lastSecond: -1
         };
         this.updateHUD();
@@ -797,6 +835,7 @@ const game = {
     },
 
     handleResult(isCorrect, val, explanation) {
+        this.state.totalQ++;
         const q = this.state.currentQ;
 
         if (isCorrect) {
@@ -805,7 +844,7 @@ const game = {
             let baseDmg = 30;
             if(this.state.settings.diff === "RE:Hard") baseDmg = 50; 
             
-            const dmg = baseDmg + (this.state.combo * 5);
+            const dmg = baseDmg + (this.state.combo * this.state.combo);
             this.state.monster.hp -= dmg;
             this.state.score += Math.ceil(this.state.timeLeft * 10 * (this.state.settings.diff === "RE:Hard" ? 2 : 1));
             
@@ -817,7 +856,7 @@ const game = {
         } else {
             audioManager.play('wrong');
             this.state.combo = 0;
-            const dmgTake = this.state.settings.diff === "RE:Hard" ? 40 : 20;
+            const dmgTake = this.state.settings.diff === "RE:Hard" ? 99 : 20;
             this.state.hp -= dmgTake;
             
             this.state.mistakes.push({
@@ -881,7 +920,7 @@ const game = {
         this.nextTurn();
     },
 
-    endGame(win) {
+endGame(win) {
         clearInterval(this.state.timer);
         audioManager.stopBGM(); 
         if(win) audioManager.play('win');
@@ -891,17 +930,49 @@ const game = {
         
         document.getElementById('end-score').innerText = this.state.score;
         document.getElementById('end-sector').innerText = this.state.level;
+
+        let rank = "D";
+        const total = this.state.totalQ;
+        const mistakes = this.state.mistakes.length;
+        const correct = total - mistakes;
+
+        const acc = total > 0 ? (correct / total) * 100 : 0;
         
-        // Calculate Rank
-        let rank = "F";
-        const score = this.state.score;
-        if (score > 5000) rank = "S+";
-        else if (score > 3000) rank = "S";
-        else if (score > 2000) rank = "A";
-        else if (score > 1000) rank = "B";
-        else if (score > 500) rank = "C";
-        
-        document.getElementById('end-rank').innerText = `RANK: ${rank}`;
+        if (total === 0) {
+            rank = "D";
+        } else if (acc === 100) rank = "SSS+";
+        else if (acc >= 97) rank = "SSS";
+        else if (acc >= 94) rank = "SS+";
+        else if (acc >= 90) rank = "SS";
+        else if (acc >= 85) rank = "S+";
+        else if (acc >= 80) rank = "S";
+        else if (acc >= 75) rank = "AAA";
+        else if (acc >= 70) rank = "AA";
+        else if (acc >= 65) rank = "A";
+        else if (acc >= 60) rank = "BBB";
+        else if (acc >= 55) rank = "BB";
+        else if (acc >= 50) rank = "B";
+        else if (acc >= 45) rank = "CCC";
+        else if (acc >= 40) rank = "CC";
+        else if (acc >= 35) rank = "C";
+        else if (acc >= 30) rank = "DDD";
+        else if (acc >= 25) rank = "DD";
+        else rank = "D";
+
+        let rankColor = "#fff";
+        if(rank.includes("S")) rankColor = "var(--warning)";
+        else if(rank.includes("A")) rankColor = "var(--primary)";
+        else if(rank.includes("B")) rankColor = "var(--success)";
+        else if(rank.includes("C")) rankColor = "#ffaa00";
+        else rankColor = "var(--danger)";
+
+        const rankEl = document.getElementById('end-rank');
+        rankEl.innerText = `RANK: ${rank}`;
+        rankEl.style.color = rankColor;
+        rankEl.style.borderColor = rankColor;
+        rankEl.style.boxShadow = `0 0 15px ${rankColor}`;
+
+        rankEl.innerHTML += `<div style="font-size:0.6rem; color:#ccc; margin-top:2px;">ACCURACY: ${acc.toFixed(1)}%</div>`;
         
         const title = document.getElementById('end-title');
         if (win) {
@@ -979,6 +1050,7 @@ document.addEventListener('click', (e) => {
 });
 
 window.onload = function() {
+    audioManager.init();
     const container = document.getElementById('topic-tags');
     TOPICS_LIST.forEach(t => {
         const el = document.createElement('div');
