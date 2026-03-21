@@ -54,6 +54,22 @@
             overflow-x: hidden;
         }
 
+        #lang-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 243, 255, 0.15);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            z-index: 100;
+        }
+
+        #lang-btn:hover { background: rgba(0, 243, 255, 0.3); box-shadow: 0 0 10px var(--primary); }
+
         /* Start Screen */
         #start-screen { padding: 20px; align-items: center; }
         .start-content-wrapper { width: 100%; max-width: 600px; padding-bottom: 50px; margin-top: 20px; flex-shrink: 0; }
@@ -164,42 +180,37 @@
         .submit-btn { padding: 0 30px; background: var(--primary); color: #000; font-weight: bold; border-radius: 2px; text-transform: uppercase; white-space: nowrap; font-size: 1.1rem;}
         .submit-btn:disabled { background: #555; color: #aaa; cursor: wait; }
 
-            .summary-card {
-                background: linear-gradient(135deg, rgba(10,10,30,0.95), rgba(20,20,40,0.95));
-                border: 1px solid var(--primary);
-                box-shadow: 0 0 60px rgba(0, 243, 255, 0.15);
-                border-radius: 8px;
-                padding: 24px 22px 16px 22px; /* reduce top/bottom padding to fit */
-                width: 92%;
-                max-width: 800px; /* allow wider summary */
-                margin: 24px auto;
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                max-height: calc(100vh - 80px); /* limit card height to viewport */
-                overflow: hidden; /* keep actions visible while content scrolls */
-            }
+        .summary-card {
+            background: linear-gradient(135deg, rgba(10,10,30,0.95), rgba(20,20,40,0.95));
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 60px rgba(0, 243, 255, 0.15);
+            border-radius: 8px;
+            padding: 24px 22px 16px 22px; 
+            width: 92%;
+            max-width: 800px; 
+            margin: 24px auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: calc(100vh - 80px); 
+            overflow: hidden; 
+        }
         
         .summary-header { text-align: center; margin-bottom: 10px; }
         .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 0; }
         .ai-report-container { background: rgba(0,0,0,0.4); border: 1px dashed #444; padding: 12px; border-radius: 4px; min-height: 100px; text-align: left; position: relative; margin-top: 10px; }
 
-        /* Make the report area scrollable when content is long */
-        .summary-scroll-area {
-            overflow: auto;
-            padding-right: 8px; /* give space for scrollbar */
-        }
+        .summary-scroll-area { overflow: auto; padding-right: 8px; }
         .action-row { margin-top: 10px; text-align: center; }
 
-        /* Sticky action bar at bottom of the card so the button is always reachable */
         .summary-actions-sticky {
             position: sticky;
             bottom: 0;
             background: linear-gradient(180deg, rgba(10,10,20,0), rgba(10,10,30,0.9));
             padding-top: 10px;
             padding-bottom: 8px;
-            margin: 0 -22px -8px -22px; /* extend to card edges */
+            margin: 0 -22px -8px -22px;
             display: flex;
             justify-content: center;
             z-index: 10;
@@ -276,6 +287,8 @@
 
     <!-- Start Screen -->
     <div id="start-screen" class="screen">
+        <button id="lang-btn" onclick="toggleLang()">🌐 EN</button>
+
         <div class="start-content-wrapper flex-col center">
             <h1>🛡️ NETWORK DEFENDER ⚔️</h1>
             <div class="subtitle">HKDSE ICT | HYBRID V24 (AI + LOCAL)</div>
@@ -283,41 +296,41 @@
             <div style="width: 100%;">
                 <div class="setting-group">
                     <div class="header-row">
-                        <div class="setting-title">目標系統 (課題)</div>
+                        <div class="setting-title" id="t-topicTitle">目標系統 (課題)</div>
                         <button id="btn-toggle-all" class="toggle-btn" style="background:var(--primary-dim); color:white; border:none; padding:2px 5px; font-size:0.7rem;" onclick="toggleAllTopics()">全選/反選</button>
                     </div>
                     <div class="tag-container" id="topic-tags"></div>
                 </div>
 
                 <div class="setting-group">
-                    <div class="setting-title">攻防模式</div>
+                    <div class="setting-title" id="t-modeTitle">攻防模式</div>
                     <div class="tag-container" id="type-tags">
-                        <div class="tag selected" data-value="MC">選擇題 (MC)</div>
-                        <div class="tag selected" data-value="SHORT">短答題 (Short)</div>
+                        <div class="tag selected" data-value="MC" id="t-mcType">選擇題 (MC)</div>
+                        <div class="tag selected" data-value="SHORT" id="t-shortType">短答題 (Short)</div>
                     </div>
                 </div>
 
                 <div class="setting-group">
-                    <div class="setting-title">系統難度</div>
+                    <div class="setting-title" id="t-diffTitle">系統難度</div>
                     <div class="tag-container" id="diff-tags" style="margin-bottom:10px;">
                         <div class="tag selected" id="btn-easy" data-value="Easy">Easy (60s)</div>
                         <div class="tag" id="btn-normal" data-value="Normal">Normal (30s)</div>
-                        <div class="tag" id="btn-hard" data-value="Hard">Hard (30s)</div>
-                        <div class="tag" id="btn-rehard" data-value="RE:Hard">RE:Hard 💀 (120s)(Online)</div>
+                        <div class="tag" id="btn-hard" data-value="Hard">Hard (15s)</div>
+                        <div class="tag" id="btn-rehard" data-value="RE:Hard">RE:Hard 💀(Online)</div>
                     </div>
-                    <div class="setting-title">防禦層數 (關卡數)</div>
+                    <div class="setting-title" id="t-levelTitle">防禦層數 (關卡數)</div>
                     <div class="tag-container" id="level-tags">
-                        <div class="tag selected" data-value="1">1 Sector</div>
-                        <div class="tag" data-value="3">3 Sectors</div>
-                        <div class="tag" data-value="5">5 Sectors</div>
-                        <div class="tag" data-value="99">Endless</div>
+                        <div class="tag selected" data-value="1" id="t-level1">1 Sector</div>
+                        <div class="tag" data-value="3" id="t-level3">3 Sectors</div>
+                        <div class="tag" data-value="5" id="t-level5">5 Sectors</div>
+                        <div class="tag" data-value="99" id="t-level99">Endless</div>
                     </div>
                 </div>
                 
                 <button id="start-btn" class="start-btn" onclick="game.init()">START MISSION</button>
                 <div style="margin-top:15px; font-size:0.7rem; color:#666; text-align: center;">
-                    <span style="color:var(--success)">● SYSTEM READY</span><br>
-                    AI Generation with Offline Fail-safe Database
+                    <span style="color:var(--success)" id="t-sysReady">● SYSTEM READY</span><br>
+                    <span id="t-sysReadyDesc">AI Generation with Offline Fail-safe Database</span>
                 </div>
             </div>
         </div>
@@ -335,9 +348,9 @@
         <div class="hud">
             <div style="display:flex; align-items: center;">
                 <button class="hud-btn" onclick="game.endGame(false)">🏁</button>
-                <div class="stat-box" style="margin-left: 15px;"><div>SECTOR</div><div class="stat-value" id="hud-level">1</div></div>
-                <div class="stat-box"><div>SCORE</div><div class="stat-value" id="hud-score">0</div></div>
-                <div class="stat-box"><div>CHAIN</div><div class="stat-value" id="hud-combo" style="color:var(--success)">x0</div></div>
+                <div class="stat-box" style="margin-left: 15px;"><div id="t-hudSector">SECTOR</div><div class="stat-value" id="hud-level">1</div></div>
+                <div class="stat-box"><div id="t-hudScore">SCORE</div><div class="stat-value" id="hud-score">0</div></div>
+                <div class="stat-box"><div id="t-hudChain">CHAIN</div><div class="stat-value" id="hud-combo" style="color:var(--success)">x0</div></div>
             </div>
             <div class="q-queue-count" id="queue-debug">Mode: Auto</div>
         </div>
@@ -353,7 +366,7 @@
         </div>
 
         <div class="player-stats">
-            <div style="font-weight:bold; color:var(--primary); font-size:0.8rem;">FIREWALL</div>
+            <div style="font-weight:bold; color:var(--primary); font-size:0.8rem;" id="t-firewall">FIREWALL</div>
             <div class="player-hp-bar"><div class="player-hp-fill" id="player-hp-fill"></div></div>
             <div style="font-size:0.9rem;" id="player-hp-text">100%</div>
         </div>
@@ -372,12 +385,12 @@
                 <div id="fb-damage" style="font-family:monospace; color:var(--warning); margin-bottom:10px;"></div>
                 <div id="fb-ai-badge" class="ai-badge hidden">✨ AI Analysis</div>
                 <div class="feedback-rationale" id="fb-rationale">Rationale</div>
-                <button class="start-btn" style="margin-top:20px; font-size:1rem; padding:10px;" onclick="game.nextAction()">CONTINUE >></button>
+                <button class="start-btn" id="fb-continue-btn" style="margin-top:20px; font-size:1rem; padding:10px;" onclick="game.nextAction()">CONTINUE >></button>
             </div>
         </div>
     </div>
 
-    <!-- Summary Screen (Redesigned) -->
+    <!-- Summary Screen -->
     <div id="summary-screen" class="screen hidden full-screen">
         <div class="summary-card">
             <div class="summary-header">
@@ -387,17 +400,17 @@
             
             <div class="summary-grid">
                 <div class="summary-stat">
-                    <div class="summary-stat-label">Total Score</div>
+                    <div class="summary-stat-label" id="t-totalScore">總分數</div>
                     <div class="summary-stat-value" id="end-score" style="color:var(--warning)">0</div>
                 </div>
                 <div class="summary-stat">
-                    <div class="summary-stat-label">Sectors</div>
+                    <div class="summary-stat-label" id="t-sectorsPassed">通關層數</div>
                     <div class="summary-stat-value" id="end-sector" style="color:var(--primary)">0</div>
                 </div>
             </div>
 
             <div class="ai-report-container">
-                <div class="ai-report-title"><span>🤖</span> TACTICAL DEBRIEF</div>
+                <div class="ai-report-title" id="t-debriefTitle"><span>🤖</span> 戰術總結</div>
                 <div class="summary-scroll-area" style="max-height:300px;">
                     <div id="ai-report-text" class="ai-report-text report-loading">Connecting to HQ...</div>
                 </div>
@@ -405,77 +418,85 @@
 
             <div class="summary-actions-sticky">
                 <div style="width:100%; max-width:420px; display:flex; justify-content:center;">
-                    <button class="start-btn" onclick="game.rebootGame()">REBOOT SYSTEM</button>
+                    <button class="start-btn" id="t-rebootBtn" onclick="game.rebootGame()">REBOOT SYSTEM</button>
                 </div>
             </div>
         </div>
     </div>
 
 <script>
+// --- Multi-language Support ---
+const i18n = {
+    zh: {
+        topicTitle: "目標系統 (課題)", toggleAll: "全選/反選", modeTitle: "攻防模式",
+        mcType: "選擇題 (MC)", shortType: "短答題 (Short)",
+        diffTitle: "系統難度", levelTitle: "防禦層數 (關卡數)",
+        sectorWord: "Sector", sectorWords: "Sectors", endlessWord: "Endless",
+        sysReady: "● SYSTEM READY", sysReadyDesc: "AI Generation with Offline Fail-safe Database",
+        errSelect: "請選擇最少一個課題及題型！",
+        errRehardOffline: "⚠️ RE:Hard 難度必須連接互聯網才能運作！\n請檢查網絡連接或選擇其他難度。",
+        errRehardGen: "⚠️ 連接失敗！RE:Hard 模式無法生成題目。遊戲將返回主頁面。",
+        errRehardDrop: "⚠️ 網絡連接中斷！RE:Hard 模式無法繼續。",
+        loadTexts:["連線中...", "解密中...", "同步資料庫...", "初始化...", "啟動系統..."],
+        sysReadyLoad: "系統就緒 (SYSTEM READY)",
+        hudSector: "SECTOR", hudScore: "SCORE", hudChain: "CHAIN", firewall: "FIREWALL",
+        modeFetching: "Mode: AI Fetching...", modeAuto: "Mode: Auto",
+        timeUp: "時間到 (TIME UP)", timeLimitExc: "超出時間限制。",
+        judging: "JUDGING...", shortPlaceholder: "輸入答案...", shortSend: "SEND",
+        correctAnswer: "正確答案", critHit: "致命打擊! (CRITICAL HIT!)", breach: "防火牆受損! (FIREWALL BREACHED!)",
+        fbThreatNeutral: "威脅已消除 (THREAT NEUTRALIZED)", fbSysBreach: "系統被入侵 (SYSTEM BREACHED)",
+        btnContinue: "繼續 (CONTINUE) >>",
+        summaryTitleWin: "任務完成 (MISSION COMPLETE)", summaryTitleLose: "系統故障 (SYSTEM FAILURE)",
+        totalScore: "總分數", sectorsPassed: "通關層數", debriefTitle: "<span>🤖</span> 戰術總結", rebootBtn: "重啟系統 (REBOOT SYSTEM)",
+        analyzing: "分析戰鬥日誌中...", perfectClear: "咁勁？！犀利喎👍👍👍", aiOffline: "系統離線。戰術報告無法使用。",
+        aiLangText: "Traditional Chinese (HK terminology)", aiDebriefLangText: "Traditional Chinese (Cantonese)"
+    },
+    en: {
+        topicTitle: "Target Systems (Topics)", toggleAll: "Select / Deselect All", modeTitle: "Attack/Defense Mode",
+        mcType: "Multiple Choice (MC)", shortType: "Short Answer (Short)",
+        diffTitle: "System Difficulty", levelTitle: "Defense Layers (Sectors)",
+        sectorWord: "Sector", sectorWords: "Sectors", endlessWord: "Endless",
+        sysReady: "● SYSTEM READY", sysReadyDesc: "AI Generation with Offline Fail-safe Database",
+        errSelect: "Please select at least one topic and question type!",
+        errRehardOffline: "⚠️ RE:Hard requires an active internet connection!\nPlease check your network or choose another difficulty.",
+        errRehardGen: "⚠️ Connection Failed! RE:Hard mode cannot generate questions. Returning to main menu.",
+        errRehardDrop: "⚠️ Network connection lost! RE:Hard mode cannot continue.",
+        loadTexts:["CONNECTING...", "DECRYPTING...", "SYNCING DB...", "INITIALIZING...", "BOOTING SYSTEM..."],
+        sysReadyLoad: "SYSTEM READY",
+        hudSector: "SECTOR", hudScore: "SCORE", hudChain: "CHAIN", firewall: "FIREWALL",
+        modeFetching: "Mode: AI Fetching...", modeAuto: "Mode: Auto",
+        timeUp: "TIME UP", timeLimitExc: "Time limit exceeded.",
+        judging: "JUDGING...", shortPlaceholder: "Type answer...", shortSend: "SEND",
+        correctAnswer: "Correct Answer", critHit: "CRITICAL HIT!", breach: "FIREWALL BREACHED!",
+        fbThreatNeutral: "THREAT NEUTRALIZED", fbSysBreach: "SYSTEM BREACHED",
+        btnContinue: "CONTINUE >>",
+        summaryTitleWin: "MISSION COMPLETE", summaryTitleLose: "SYSTEM FAILURE",
+        totalScore: "Total Score", sectorsPassed: "Sectors Passed", debriefTitle: "<span>🤖</span> TACTICAL DEBRIEF", rebootBtn: "REBOOT SYSTEM",
+        analyzing: "Analyzing battle logs...", perfectClear: "Flawless victory! Outstanding performance! 👍👍👍", aiOffline: "System Offline. Tactical report unavailable.",
+        aiLangText: "English", aiDebriefLangText: "English"
+    }
+};
+
 const audioManager = {
     sounds: {
-        bgm: "assets/audio/BG.mp3",
-        judging: "assets/audio/Mai2Cue[69].mp3",
-        generic: "assets/audio/Mai2Cue[288].mp3",
-        easy: "assets/audio/Mai2Cue[289].mp3",
-        normal: "assets/audio/Mai2Cue[290].mp3",
-        hard: "assets/audio/Mai2Cue[291].mp3",
-        rehard: "assets/audio/Mai2Cue[292].mp3",
-        start: "assets/audio/Mai2Cue[397].mp3",
-        start_rehard: "assets/audio/Mai2Cue[400].mp3",
-        warn30: "assets/audio/Mai2Cue[390].mp3",
-        count10: "assets/audio/Mai2Cue[389].mp3",
-        timeout: "assets/audio/Mai2Cue[83].mp3",
-        correct: "assets/audio/Mai2Cue[54].mp3",
-        wrong: "assets/audio/Mai2Cue[53].mp3",
-        win: "assets/audio/Mai2Cue[345].mp3",
-        lose: "assets/audio/Mai2Cue[344].mp3",
-        reboot: "assets/audio/Mai2Cue[347].mp3"
+        bgm: "assets/audio/BG.mp3", judging: "assets/audio/Mai2Cue[69].mp3", generic: "assets/audio/Mai2Cue[288].mp3",
+        easy: "assets/audio/Mai2Cue[289].mp3", normal: "assets/audio/Mai2Cue[290].mp3", hard: "assets/audio/Mai2Cue[291].mp3",
+        rehard: "assets/audio/Mai2Cue[292].mp3", start: "assets/audio/Mai2Cue[397].mp3", start_rehard: "assets/audio/Mai2Cue[400].mp3",
+        warn30: "assets/audio/Mai2Cue[390].mp3", count10: "assets/audio/Mai2Cue[389].mp3", timeout: "assets/audio/Mai2Cue[83].mp3",
+        correct: "assets/audio/Mai2Cue[54].mp3", wrong: "assets/audio/Mai2Cue[53].mp3", win: "assets/audio/Mai2Cue[345].mp3",
+        lose: "assets/audio/Mai2Cue[344].mp3", reboot: "assets/audio/Mai2Cue[347].mp3"
     },
     bgmAudio: null,
-
-    init() {
-        console.log("Audio Init: Warming up cache...");
-        Object.keys(this.sounds).forEach(key => {
-            const a = new Audio(this.sounds[key]);
-            a.volume = 0;
-            a.load(); 
-        });
-    },
-
+    init() { Object.keys(this.sounds).forEach(key => { const a = new Audio(this.sounds[key]); a.volume = 0; a.load(); }); },
     play(key) {
         if (!this.sounds[key]) return;
-
-        try {
-            const sound = new Audio(this.sounds[key]);
-            sound.volume = 0.8;
-
-            const playPromise = sound.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    // console.log("Audio blocked (user interaction needed):", error);
-                });
-            }
-        } catch (e) {
-            console.error("Audio Error:", e);
-        }
+        try { const sound = new Audio(this.sounds[key]); sound.volume = 0.8; sound.play().catch(e => {}); } catch(e){}
     },
-
     playBGM() {
-        if (!this.bgmAudio) {
-            this.bgmAudio = new Audio(this.sounds.bgm);
-            this.bgmAudio.loop = true;
-            this.bgmAudio.volume = 0.4; 
-        }
-        this.bgmAudio.play().catch(e => console.log("BGM Autoplay blocked", e));
+        if (!this.bgmAudio) { this.bgmAudio = new Audio(this.sounds.bgm); this.bgmAudio.loop = true; this.bgmAudio.volume = 0.4; }
+        this.bgmAudio.play().catch(e => {});
     },
-
-    stopBGM() {
-        if (this.bgmAudio) {
-            this.bgmAudio.pause();
-            this.bgmAudio.currentTime = 0;
-        }
-    }
+    stopBGM() { if(this.bgmAudio) { this.bgmAudio.pause(); this.bgmAudio.currentTime = 0; } }
 };
 
 const API_CONFIG = {
@@ -485,47 +506,53 @@ const API_CONFIG = {
     batchSize: 10
 };
 
-const TOPICS_LIST = [
-    { id: 'BASIC', name: '1. 電腦網絡基礎' },
-    { id: 'LANWAN', name: '2. LAN, WAN & Transmission' },
-    { id: 'HW', name: '3. 網絡設備 (Switch/Router)' },
-    { id: 'PROTO', name: '4. Protocols (IP/TCP/UDP)' },
-    { id: 'WEB_EMAIL', name: '5. Internet Services' },
-    { id: 'SEC', name: '6. 網絡安全 (Security)' }
+const TOPICS_LIST =[
+    { id: 'BASIC', zh: '1. 電腦網絡基礎', en: '1. Basic Networking Concepts' },
+    { id: 'LANWAN', zh: '2. LAN, WAN & Transmission', en: '2. LAN, WAN & Transmission' },
+    { id: 'HW', zh: '3. 網絡設備 (Switch/Router)', en: '3. Network Devices (Switch/Router)' },
+    { id: 'PROTO', zh: '4. Protocols (IP/TCP/UDP)', en: '4. Protocols (IP/TCP/UDP)' },
+    { id: 'WEB_EMAIL', zh: '5. Internet Services', en: '5. Internet Services' },
+    { id: 'SEC', zh: '6. 網絡安全 (Security)', en: '6. Network Security' }
 ];
 
-const LOCAL_DB = [
-    { topics: ["BASIC"], type: "MC", question: "建立電腦網絡的主要目的不包括：", options: ["增加硬件成本", "資源共享", "提升通訊效率", "共享連線"], answer: "增加硬件成本", rationale: "網絡旨在降低重複購置硬件的成本。" },
+const LOCAL_DB_ZH = [
+    { topics: ["BASIC"], type: "MC", question: "建立電腦網絡的主要目的不包括：", options:["增加硬件成本", "資源共享", "提升通訊效率", "共享連線"], answer: "增加硬件成本", rationale: "網絡旨在降低重複購置硬件的成本。" },
     { topics: ["BASIC"], type: "SHORT", question: "利用網絡傳送電郵及進行視像會議，體現了網絡的什麼好處？(兩個字)", answer: "通訊", keywords: ["通訊", "溝通"], rationale: "網絡極大提升了通訊效率。" },
-    { topics: ["HW"], type: "MC", question: "負責將電腦連接到網絡，並進行數碼訊號轉換的卡片是？", options: ["網絡介面卡 (NIC)", "顯示卡", "音效卡", "USB 卡"], answer: "網絡介面卡 (NIC)", rationale: "NIC (Network Interface Card) 是連網必須硬件。" },
+    { topics: ["HW"], type: "MC", question: "負責將電腦連接到網絡，並進行數碼訊號轉換的卡片是？", options:["網絡介面卡 (NIC)", "顯示卡", "音效卡", "USB 卡"], answer: "網絡介面卡 (NIC)", rationale: "NIC (Network Interface Card) 是連網必須硬件。" },
     { topics: ["HW"], type: "SHORT", question: "用來連接多部電腦組成一個 LAN 並根據 MAC 地址轉送資料的設備是？", answer: "交換器", keywords: ["交換器", "switch"], rationale: "Switch 智能轉送封包。" },
-    { topics: ["PROTO"], type: "MC", question: "TCP 協議的主要功能是？", options: ["可靠傳輸 (重傳遺失封包)", "尋址", "加密", "壓縮"], answer: "可靠傳輸 (重傳遺失封包)", rationale: "TCP 提供可靠的連接導向傳輸。" },
+    { topics: ["PROTO"], type: "MC", question: "TCP 協議的主要功能是？", options:["可靠傳輸 (重傳遺失封包)", "尋址", "加密", "壓縮"], answer: "可靠傳輸 (重傳遺失封包)", rationale: "TCP 提供可靠的連接導向傳輸。" },
     { topics: ["PROTO"], type: "SHORT", question: "將域名 (如 google.com) 轉換為 IP 地址的系統是？(英文簡寫)", answer: "DNS", keywords: ["dns"], rationale: "Domain Name System。" },
-    { topics: ["SEC"], type: "MC", question: "釣魚攻擊 (Phishing) 通常透過什麼方式進行？", options: ["偽冒電郵或網站", "暴力破解密碼", "DDoS", "直接偷取硬碟"], answer: "偽冒電郵或網站", rationale: "釣魚主要依靠社會工程學欺騙用戶。" },
+    { topics: ["SEC"], type: "MC", question: "釣魚攻擊 (Phishing) 通常透過什麼方式進行？", options:["偽冒電郵或網站", "暴力破解密碼", "DDoS", "直接偷取硬碟"], answer: "偽冒電郵或網站", rationale: "釣魚主要依靠社會工程學欺騙用戶。" },
     { topics: ["SEC"], type: "SHORT", question: "為了防止未授權存取，Wi-Fi 應啟用 WPA2 或 WPA____ 加密。(填數字)", answer: "3", keywords: ["3"], rationale: "WPA3 是較新的標準。" }
 ];
 
-const MONSTERS = [
-    { name: "Bit-Rot Larva", emoji: "🐛", hp: 100 },
-    { name: "Latency Specter", emoji: "👻", hp: 150 },
-    { name: "Trojan Construct", emoji: "🤖", hp: 200 },
-    { name: "DDoS Titan", emoji: "🦾", hp: 300 },
-    { name: "Logic Bomb", emoji: "💣", hp: 250 },
-    { name: "Zero-Day Wraith", emoji: "☠️", hp: 400 },
+const LOCAL_DB_EN = [
+    { topics: ["BASIC"], type: "MC", question: "The main purpose of establishing a computer network does NOT include:", options:["Increasing hardware costs", "Resource sharing", "Improving communication efficiency", "Connection sharing"], answer: "Increasing hardware costs", rationale: "Networks aim to reduce the cost of duplicate hardware purchases." },
+    { topics: ["BASIC"], type: "SHORT", question: "Using a network to send emails and conduct video conferences reflects which benefit of networks? (One word)", answer: "Communication", keywords: ["Communication", "Communicating"], rationale: "Networks greatly improve communication efficiency." },
+    { topics:["HW"], type: "MC", question: "Which card connects a computer to a network and performs digital signal conversion?", options: ["Network Interface Card (NIC)", "Display Card", "Sound Card", "USB Card"], answer: "Network Interface Card (NIC)", rationale: "NIC (Network Interface Card) is essential hardware for networking." },
+    { topics: ["HW"], type: "SHORT", question: "Which device is used to connect multiple computers to form a LAN and forwards data based on MAC addresses?", answer: "Switch", keywords: ["Switch", "Switches"], rationale: "A Switch intelligently forwards packets based on MAC." },
+    { topics: ["PROTO"], type: "MC", question: "What is the primary function of the TCP protocol?", options:["Reliable transmission (retransmitting lost packets)", "Addressing", "Encryption", "Compression"], answer: "Reliable transmission (retransmitting lost packets)", rationale: "TCP provides reliable, connection-oriented transmission." },
+    { topics: ["PROTO"], type: "SHORT", question: "Which system translates domain names (e.g., google.com) into IP addresses? (Abbreviation)", answer: "DNS", keywords: ["dns"], rationale: "Domain Name System." },
+    { topics: ["SEC"], type: "MC", question: "How is a Phishing attack typically conducted?", options:["Fake emails or websites", "Brute-force password cracking", "DDoS", "Physically stealing hard drives"], answer: "Fake emails or websites", rationale: "Phishing primarily relies on social engineering to deceive users." },
+    { topics: ["SEC"], type: "SHORT", question: "To prevent unauthorized access, Wi-Fi should enable WPA2 or WPA____ encryption. (Enter a number)", answer: "3", keywords: ["3"], rationale: "WPA3 is the newer standard." }
+];
+
+const MONSTERS =[
+    { name: "Bit-Rot Larva", emoji: "🐛", hp: 100 }, { name: "Latency Specter", emoji: "👻", hp: 150 },
+    { name: "Trojan Construct", emoji: "🤖", hp: 200 }, { name: "DDoS Titan", emoji: "🦾", hp: 300 },
+    { name: "Logic Bomb", emoji: "💣", hp: 250 }, { name: "Zero-Day Wraith", emoji: "☠️", hp: 400 },
     { name: "RE:H4RD OVERLORD", emoji: "👺", hp: 666 }
 ];
 
 // --- AI MANAGER ---
 const aiManager = {
-    queue: [],
-    isFetching: false,
-    useLocalOnly: false,
+    queue:[], isFetching: false, useLocalOnly: false,
     
     async fillQueue(topics, difficulty, types) {
         if (this.isFetching) return;
         
         if (difficulty === "RE:Hard" && !navigator.onLine) {
-            alert("⚠️ CONNECTION LOST!\nRE:HARD requires an active internet connection.\nSystem Halted.");
+            alert(i18n[game.currentLang].errRehardDrop);
             return; 
         }
 
@@ -535,11 +562,11 @@ const aiManager = {
         }
 
         this.isFetching = true;
-        document.getElementById('queue-debug').innerText = "Mode: AI Fetching...";
+        document.getElementById('queue-debug').innerText = i18n[game.currentLang].modeFetching;
         document.getElementById('queue-debug').style.color = 'yellow';
         
         const count = API_CONFIG.batchSize;
-        const topicNames = TOPICS_LIST.filter(t => topics.includes(t.id)).map(t => t.name).join(", ");
+        const topicNames = TOPICS_LIST.filter(t => topics.includes(t.id)).map(t => t[game.currentLang]).join(", ");
         
         let diffInstruction = difficulty;
         if (difficulty === "RE:Hard") {
@@ -559,12 +586,13 @@ const aiManager = {
             avoidInstruction = `IMPORTANT: DO NOT generate the following questions again (Duplicates Forbidden): ${JSON.stringify(historyContext)}. Generate completely NEW questions.`;
         }
 
+        const langInstruct = i18n[game.currentLang].aiLangText;
         const systemPrompt = `You are a HKDSE ICT Exam Constructor.
         Generate a JSON array of ${count} DISTINCT questions about: ${topicNames}.
         Difficulty: ${diffInstruction}.
         Types: ${types.join(", ")}.
-        Language: Traditional Chinese (HK terminology).
-        Format: {"questions": [{"type": "MC" or "SHORT", "question": "...", "options": ["A", "B", "C", "D"], "answer": "...", "rationale": "..."}]}
+        Language: ${langInstruct}.
+        Format: {"questions":[{"type": "MC" or "SHORT", "question": "...", "options": ["A", "B", "C", "D"], "answer": "...", "rationale": "..."}]}
         ${avoidInstruction}
         RETURN JSON ONLY.`;
 
@@ -584,11 +612,8 @@ const aiManager = {
             }
         } catch (e) {
             console.error("AI Fetch Error:", e);
-            if (difficulty === "RE:Hard") {
-                 console.warn("RE:HARD Fetch Failed. Refusing fallback.");
-            } else {
-                 this.fillFromLocal(topics, types, 3);
-            }
+            if (difficulty === "RE:Hard") console.warn("RE:HARD Fetch Failed. Refusing fallback.");
+            else this.fillFromLocal(topics, types, 3);
         } finally {
             this.isFetching = false;
             this.updateQueueUI();
@@ -596,11 +621,11 @@ const aiManager = {
     },
 
     fillFromLocal(topics, types, count) {
-        let pool = LOCAL_DB.filter(q => 
-            (topics.some(t => q.topics.includes(t)) || q.topics.includes("BASIC")) && 
-            types.includes(q.type)
+        const DB = game.currentLang === 'zh' ? LOCAL_DB_ZH : LOCAL_DB_EN;
+        let pool = DB.filter(q => 
+            (topics.some(t => q.topics.includes(t)) || q.topics.includes("BASIC")) && types.includes(q.type)
         );
-        if (pool.length === 0) pool = LOCAL_DB;
+        if (pool.length === 0) pool = DB;
 
         for (let i = 0; i < count; i++) {
             const randomQ = pool[Math.floor(Math.random() * pool.length)];
@@ -627,11 +652,8 @@ const aiManager = {
     async getNextQuestion(topics, difficulty, types) {
         if (this.queue.length === 0) {
             await this.fillQueue(topics, difficulty, types); 
-            if (this.queue.length === 0 && difficulty === "RE:Hard") {
-                 return null;
-            } else if (this.queue.length === 0) {
-                 this.fillFromLocal(topics, types, 1);
-            }
+            if (this.queue.length === 0 && difficulty === "RE:Hard") return null;
+            else if (this.queue.length === 0) this.fillFromLocal(topics, types, 1);
         } else if (this.queue.length <= 4 && !this.isFetching) { 
             this.fillQueue(topics, difficulty, types);
         }
@@ -641,14 +663,12 @@ const aiManager = {
 
     async gradeAnswer(questionObj, userAnswer) {
         if (!questionObj.isAI || !navigator.onLine) {
-            console.log("Using Local Grading");
             const lowerUser = userAnswer.toLowerCase().trim();
             let isCorrect = false;
             if (questionObj.keywords && Array.isArray(questionObj.keywords)) {
                 isCorrect = questionObj.keywords.some(k => lowerUser.includes(k.toLowerCase()));
             } else {
-                isCorrect = lowerUser.includes(questionObj.answer.toLowerCase()) || 
-                            questionObj.answer.toLowerCase().includes(lowerUser);
+                isCorrect = lowerUser.includes(questionObj.answer.toLowerCase()) || questionObj.answer.toLowerCase().includes(lowerUser);
             }
             return { correct: isCorrect, feedback: questionObj.rationale };
         }
@@ -659,50 +679,40 @@ const aiManager = {
             const jsonStr = data.choices[0].message.content.replace(/```json/g, '').replace(/```/g, '').trim();
             return JSON.parse(jsonStr);
         } catch (e) {
-            console.log("AI Grading Failed, fallback local");
-            const isMatch = userAnswer.includes(questionObj.answer);
+            const isMatch = userAnswer.toLowerCase().includes(questionObj.answer.toLowerCase());
             return { correct: isMatch, feedback: "AI Offline. Keyword match used." };
         }
     },
 
     async generateSummaryReport(mistakes) {
-        if (!navigator.onLine) return "System Offline. Tactical report unavailable.";
-        if (mistakes.length === 0) return "咁勁？！犀利喎👍👍👍";
+        if (!navigator.onLine) return i18n[game.currentLang].aiOffline;
+        if (mistakes.length === 0) return i18n[game.currentLang].perfectClear;
         
         const mistakesText = mistakes.slice(0, 5).map(m => `- Q: ${m.question.substring(0,20)}... | Ans: ${m.correct}`).join("\n");
+        const debriefLang = i18n[game.currentLang].aiDebriefLangText;
 
         let prompt = "";
         if (game.state.settings.diff !== "RE:Hard") {
-            prompt = `Analyze mistakes: ${mistakesText}. Write a encouraging tactical debrief in Traditional Chinese (Cantonese).Max 500 words.`;
+            prompt = `Analyze mistakes: ${mistakesText}. Write a encouraging tactical debrief in in Traditional Chinese (Cantonese). Max 500 words.`;
         } else {
-            prompt = `Analyze mistakes: ${mistakesText}. Write a harsh, brutal, critical style tactical debrief in Traditional Chinese (Cantonese).Max 500 words.`;
+            prompt = `Analyze mistakes: ${mistakesText}. Write a very harsh, brutal, critical style tactical debrief in in Traditional Chinese (Cantonese). Max 500 words.`;
         }
 
         try {
             const data = await this.fetchAI("ICT Teacher", prompt, false);
             return data.choices[0].message.content;
-        } catch (e) {
-            console.error(e);
-            return "Unable to generate report due to network interference.";
-        }
+        } catch (e) { return "Unable to generate report due to network interference."; }
     },
 
     async fetchAI(sys, user, jsonMode = true) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s Timeout
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
 
-        const body = {
-            model: API_CONFIG.model,
-            messages: [{ role: "system", content: sys }, { role: "user", content: user }],
-            temperature: 0.7
-        };
+        const body = { model: API_CONFIG.model, messages:[{ role: "system", content: sys }, { role: "user", content: user }], temperature: 0.7 };
         if (jsonMode) body.response_format = { type: "json_object" };
 
         const res = await fetch(API_CONFIG.baseUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_CONFIG.apiKey}` },
-            body: JSON.stringify(body),
-            signal: controller.signal
+            method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_CONFIG.apiKey}` }, body: JSON.stringify(body), signal: controller.signal
         });
         clearTimeout(timeoutId);
         if(!res.ok) throw new Error(res.statusText);
@@ -721,11 +731,10 @@ const aiManager = {
 
 // --- GAME LOGIC ---
 const game = {
+    currentLang: 'zh',
     state: {
-        hp: 100, score: 0, level: 1, combo: 0,
-        settings: {}, currentQ: null, monster: {},
-        timer: null, timeLeft: 0, mistakes: [], maxLevels: 99,
-        lastSecond: -1
+        hp: 100, score: 0, level: 1, combo: 0, settings: {}, currentQ: null, monster: {},
+        timer: null, timeLeft: 0, mistakes:[], maxLevels: 99, lastSecond: -1
     },
 
     seenQuestions: new Set(),
@@ -739,14 +748,13 @@ const game = {
             let width = 0;
             bar.style.width = "0%";
             clearInterval(this.loadingInterval);
-
             this.loadingInterval = setInterval(() => {
                 if (width < 90) {
                     width += Math.random() * 5; 
                     if (width > 90) width = 90;
                     bar.style.width = width + "%";
                     if (Math.random() > 0.8) {
-                        const texts = ["CONNECTING...", "DECRYPTING...", "DOWNLOADING...", "SYNCING DB...", "INITIALIZING...", "BOOTING SYSTEM..."];
+                        const texts = i18n[game.currentLang].loadTexts;
                         txt.innerText = texts[Math.floor(Math.random() * texts.length)];
                     }
                 }
@@ -754,7 +762,7 @@ const game = {
         } else {
             clearInterval(this.loadingInterval);
             bar.style.width = "100%";
-            txt.innerText = "SYSTEM READY";
+            txt.innerText = i18n[game.currentLang].sysReadyLoad;
         }
     },
 
@@ -764,36 +772,28 @@ const game = {
         const diff = document.querySelector('#diff-tags .tag.selected').dataset.value;
         const maxLv = parseInt(document.querySelector('#level-tags .tag.selected').dataset.value);
 
-        if(topics.length === 0 || types.length === 0) return alert("請選擇最少一個課題及題型！");
+        if(topics.length === 0 || types.length === 0) return alert(i18n[game.currentLang].errSelect);
 
-        if (diff === "RE:Hard" && !navigator.onLine) {
-            return alert("⚠️ RE:Hard 難度必須連接互聯網才能運作！\n請檢查網絡連接或選擇其他難度。");
-        }
+        if (diff === "RE:Hard" && !navigator.onLine) return alert(i18n[game.currentLang].errRehardOffline);
 
-        setTimeout(() => {
-            audioManager.playBGM();
-        }, 5000);
-        
-        if (diff === "RE:Hard") audioManager.play('start_rehard');
-        else audioManager.play('start');
+        setTimeout(() => { audioManager.playBGM(); }, 5000);
+        if (diff === "RE:Hard") audioManager.play('start_rehard'); else audioManager.play('start');
 
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('loading-screen').classList.remove('hidden');
 
         this.simulateLoading(true); 
-
         this.seenQuestions.clear(); 
 
         await aiManager.fillQueue(topics, diff, types);
         
         if (diff === "RE:Hard" && aiManager.queue.length === 0) {
-             alert("⚠️ 連接失敗！RE:Hard 模式無法生成題目。遊戲將返回主頁面。");
+             alert(i18n[game.currentLang].errRehardGen);
              location.reload();
              return;
         }
 
         this.simulateLoading(false);
-
 
         setTimeout(() => {
             document.getElementById('loading-screen').classList.add('hidden');
@@ -802,15 +802,12 @@ const game = {
         }, 800)
     },
 
-startGame: function(topics, types, diff, maxLv) {
+    startGame: function(topics, types, diff, maxLv) {
         this.state = {
             hp: 100, score: 0, level: 1, combo: 0, maxLevels: maxLv,
             settings: { topics, types, diff },
             monster: this.spawnMonster(1, diff),
-            isOver: false,
-            mistakes: [],
-            totalQ: 0,
-            lastSecond: -1
+            isOver: false, mistakes:[], totalQ: 0, lastSecond: -1
         };
         this.updateHUD();
         this.nextTurn();
@@ -820,25 +817,19 @@ startGame: function(topics, types, diff, maxLv) {
         let m;
         if (diff === "RE:Hard" && level % 5 === 0) m = MONSTERS[6]; 
         else m = MONSTERS[(level - 1) % (MONSTERS.length - 1)]; 
-        
         const mult = diff === "RE:Hard" ? 1.5 : 1.0;
         const newHp = Math.floor(m.hp * (1 + level * 0.2) * mult);
         return { ...m, hp: newHp, maxHp: newHp };
     },
 
     async nextTurn() {
-        let q = await aiManager.getNextQuestion(
-            this.state.settings.topics, 
-            this.state.settings.diff, 
-            this.state.settings.types
-        );
-        
+        let q = await aiManager.getNextQuestion(this.state.settings.topics, this.state.settings.diff, this.state.settings.types);
         if (!q && this.state.settings.diff === "RE:Hard") {
-             alert("⚠️ 網絡連接中斷！RE:Hard 模式無法繼續。");
+             alert(i18n[game.currentLang].errRehardDrop);
              this.endGame(false);
              return;
         } else if (!q) {
-             q = LOCAL_DB[0];
+             q = (game.currentLang === 'zh' ? LOCAL_DB_ZH : LOCAL_DB_EN)[0];
         }
 
         this.state.currentQ = q;
@@ -851,11 +842,8 @@ startGame: function(topics, types, diff, maxLv) {
         const area = document.getElementById('interaction-area');
         area.innerHTML = '';
         
-        if(this.state.settings.diff === "RE:Hard") {
-            document.getElementById('question-text').style.borderLeft = "3px solid var(--hell)";
-        } else {
-             document.getElementById('question-text').style.borderLeft = "none";
-        }
+        if(this.state.settings.diff === "RE:Hard") document.getElementById('question-text').style.borderLeft = "3px solid var(--hell)";
+        else document.getElementById('question-text').style.borderLeft = "none";
 
         if (q.type === 'MC') {
             const grid = document.createElement('div');
@@ -874,16 +862,13 @@ startGame: function(topics, types, diff, maxLv) {
         } else {
             area.innerHTML = `
                 <div class="short-answer-container">
-                    <input type="text" id="short-input" class="short-input" placeholder="Type answer..." autocomplete="off">
-                    <button id="short-submit-btn" class="submit-btn" onclick="game.submitShort()">SEND</button>
+                    <input type="text" id="short-input" class="short-input" placeholder="${i18n[game.currentLang].shortPlaceholder}" autocomplete="off">
+                    <button id="short-submit-btn" class="submit-btn" onclick="game.submitShort()">${i18n[game.currentLang].shortSend}</button>
                 </div>
                 <div id="ai-status" style="font-size:0.8rem; color:#aaa; margin-top:5px; height:1rem;"></div>`;
             setTimeout(() => {
                 const inp = document.getElementById('short-input');
-                if(inp) {
-                    inp.focus();
-                    inp.onkeydown = (e) => { if(e.key === 'Enter') game.submitShort(); };
-                }
+                if(inp) { inp.focus(); inp.onkeydown = (e) => { if(e.key === 'Enter') game.submitShort(); }; }
             }, 100);
         }
     },
@@ -895,13 +880,10 @@ startGame: function(topics, types, diff, maxLv) {
         
         let baseTime = 30; 
         if (diff === 'Easy') baseTime = 60;
-        if (diff === 'Hard') baseTime = 30;
-        if (diff === 'RE:Hard') baseTime = 120;
+        if (diff === 'Hard') baseTime = 15;
+        if (diff === 'RE:Hard') baseTime = 60;
 
-        // Double time for Short Questions
-        if (qType === 'SHORT') {
-            baseTime *= 2;
-        }
+        if (qType === 'SHORT') baseTime *= 2;
 
         this.state.timeLeft = baseTime;
         this.state.lastSecond = Math.ceil(baseTime); 
@@ -912,11 +894,8 @@ startGame: function(topics, types, diff, maxLv) {
             const currentSec = Math.ceil(this.state.timeLeft);
             
             if (currentSec !== this.state.lastSecond) {
-                if (currentSec === 30) {
-                    audioManager.play('warn30');
-                } else if (currentSec <= 10 && currentSec > 0) {
-                    audioManager.play('count10');
-                }
+                if (currentSec === 30) audioManager.play('warn30');
+                else if (currentSec <= 10 && currentSec > 0) audioManager.play('count10');
                 this.state.lastSecond = currentSec;
             }
 
@@ -929,7 +908,7 @@ startGame: function(topics, types, diff, maxLv) {
             if (this.state.timeLeft <= 0) {
                 clearInterval(this.state.timer);
                 audioManager.play('timeout');
-                this.handleResult(false, "TIME UP", "Time limit exceeded.");
+                this.handleResult(false, i18n[game.currentLang].timeUp, i18n[game.currentLang].timeLimitExc);
             }
         }, 100);
     },
@@ -942,7 +921,7 @@ startGame: function(topics, types, diff, maxLv) {
         document.getElementById('short-input').disabled = true;
         const btn = document.getElementById('short-submit-btn');
         btn.disabled = true;
-        btn.innerText = "JUDGING...";
+        btn.innerText = i18n[game.currentLang].judging;
         
         audioManager.play('judging');
 
@@ -953,9 +932,8 @@ startGame: function(topics, types, diff, maxLv) {
 
     submitAnswer(val) {
         clearInterval(this.state.timer);
-        const q = this.state.currentQ;
-        const isCorrect = (val === q.answer);
-        this.handleResult(isCorrect, val, q.rationale);
+        const isCorrect = (val === this.state.currentQ.answer);
+        this.handleResult(isCorrect, val, this.state.currentQ.rationale);
     },
 
     handleResult(isCorrect, val, explanation) {
@@ -965,14 +943,12 @@ startGame: function(topics, types, diff, maxLv) {
         if (isCorrect) {
             audioManager.play('correct');
             this.state.combo++;
-            let baseDmg = 30;
-            if(this.state.settings.diff === "RE:Hard") baseDmg = 50; 
-            
+            let baseDmg = this.state.settings.diff === "RE:Hard" ? 50 : 30; 
             const dmg = baseDmg + (this.state.combo * this.state.combo);
             this.state.monster.hp -= dmg;
             this.state.score += Math.ceil(this.state.timeLeft * 10 * (this.state.settings.diff === "RE:Hard" ? 2 : 1));
             
-            document.getElementById('fb-damage').innerText = `CRITICAL HIT! -${dmg} HP`;
+            document.getElementById('fb-damage').innerText = `${i18n[game.currentLang].critHit} -${dmg} HP`;
             document.getElementById('fb-damage').style.display = 'block';
 
             this.showFeedback(true, explanation);
@@ -983,19 +959,14 @@ startGame: function(topics, types, diff, maxLv) {
             const dmgTake = this.state.settings.diff === "RE:Hard" ? 99 : 20;
             this.state.hp -= dmgTake;
             
-            this.state.mistakes.push({
-                question: q.question,
-                userAns: val || "No Answer",
-                correct: q.answer
-            });
+            this.state.mistakes.push({ question: q.question, userAns: val || "No Answer", correct: q.answer });
             
-            document.getElementById('fb-damage').innerText = `FIREWALL BREACHED! -${dmgTake}%`;
+            document.getElementById('fb-damage').innerText = `${i18n[game.currentLang].breach} -${dmgTake}%`;
             document.getElementById('fb-damage').style.display = 'block';
 
-            this.showFeedback(false, `Correct Answer: ${q.answer}<br><br>${explanation}`);
+            this.showFeedback(false, `${i18n[game.currentLang].correctAnswer}: ${q.answer}<br><br>${explanation}`);
             this.animateAction('game-screen', 'shake');
         }
-        
         this.updateHUD();
     },
 
@@ -1003,18 +974,17 @@ startGame: function(topics, types, diff, maxLv) {
         const overlay = document.getElementById('feedback-overlay');
         const title = document.getElementById('fb-title');
         const icon = document.getElementById('fb-icon');
+        document.getElementById('fb-continue-btn').innerText = i18n[game.currentLang].btnContinue;
         
         overlay.classList.remove('hidden');
         if (success) {
-            title.innerText = "THREAT NEUTRALIZED";
-            title.className = "feedback-title correct-text";
-            icon.innerText = "🛡️";
+            title.innerText = i18n[game.currentLang].fbThreatNeutral;
+            title.className = "feedback-title correct-text"; icon.innerText = "🛡️";
             if(this.state.currentQ.isAI) document.getElementById('fb-ai-badge').classList.remove('hidden'); 
             else document.getElementById('fb-ai-badge').classList.add('hidden');
         } else {
-            title.innerText = "SYSTEM BREACHED";
-            title.className = "feedback-title wrong-text";
-            icon.innerText = "⚠️";
+            title.innerText = i18n[game.currentLang].fbSysBreach;
+            title.className = "feedback-title wrong-text"; icon.innerText = "⚠️";
             document.getElementById('fb-ai-badge').classList.add('hidden');
         }
         document.getElementById('fb-rationale').innerHTML = text;
@@ -1022,33 +992,23 @@ startGame: function(topics, types, diff, maxLv) {
 
     nextAction() {
         document.getElementById('feedback-overlay').classList.add('hidden');
-        
-        if (this.state.hp <= 0) {
-            this.endGame(false);
-            return;
-        }
+        if (this.state.hp <= 0) return this.endGame(false);
 
         if (this.state.monster.hp <= 0) {
-            if (this.state.level >= this.state.maxLevels) {
-                this.endGame(true); 
-                return;
-            }
-
+            if (this.state.level >= this.state.maxLevels) return this.endGame(true); 
             this.state.level++;
             const heal = this.state.settings.diff === "RE:Hard" ? 10 : 30;
             this.state.hp = Math.min(100, this.state.hp + heal);
             this.state.monster = this.spawnMonster(this.state.level, this.state.settings.diff);
             this.updateHUD();
         }
-        
         this.nextTurn();
     },
 
-endGame(win) {
+    endGame(win) {
         clearInterval(this.state.timer);
         audioManager.stopBGM(); 
-        if(win) audioManager.play('win');
-        else audioManager.play('lose');
+        if(win) audioManager.play('win'); else audioManager.play('lose');
 
         this.switchScreen('summary-screen');
         
@@ -1057,14 +1017,11 @@ endGame(win) {
 
         let rank = "D";
         const total = this.state.totalQ;
-        const mistakes = this.state.mistakes.length;
-        const correct = total - mistakes;
-
+        const correct = total - this.state.mistakes.length;
         const acc = total > 0 ? (correct / total) * 100 : 0;
         
-        if (total === 0) {
-            rank = "D";
-        } else if (acc === 100) rank = "SSS+";
+        if (total === 0) rank = "D";
+        else if (acc === 100) rank = "SSS+";
         else if (acc >= 97) rank = "SSS";
         else if (acc >= 94) rank = "SS+";
         else if (acc >= 90) rank = "SS";
@@ -1095,19 +1052,13 @@ endGame(win) {
         rankEl.style.color = rankColor;
         rankEl.style.borderColor = rankColor;
         rankEl.style.boxShadow = `0 0 15px ${rankColor}`;
-
         rankEl.innerHTML += `<div style="font-size:0.6rem; color:#ccc; margin-top:2px;">ACCURACY: ${acc.toFixed(1)}%</div>`;
         
         const title = document.getElementById('end-title');
-        if (win) {
-            title.innerText = "MISSION COMPLETE";
-            title.style.color = "var(--success)";
-        } else {
-            title.innerText = "SYSTEM FAILURE";
-            title.style.color = "var(--danger)";
-        }
+        if (win) { title.innerText = i18n[game.currentLang].summaryTitleWin; title.style.color = "var(--success)"; } 
+        else { title.innerText = i18n[game.currentLang].summaryTitleLose; title.style.color = "var(--danger)"; }
 
-        document.getElementById('ai-report-text').innerText = "Analyzing battle logs...";
+        document.getElementById('ai-report-text').innerText = i18n[game.currentLang].analyzing;
         document.getElementById('ai-report-text').classList.add('report-loading');
         
         aiManager.generateSummaryReport(this.state.mistakes).then(report => {
@@ -1115,11 +1066,9 @@ endGame(win) {
             el.classList.remove('report-loading');
             el.classList.add('report-typing');
             
-            let i = 0;
-            el.innerText = "";
+            let i = 0; el.innerText = "";
             const interval = setInterval(() => {
-                el.innerText += report.charAt(i);
-                i++;
+                el.innerText += report.charAt(i); i++;
                 if (i > report.length - 1) clearInterval(interval);
             }, 15);
         });
@@ -1127,9 +1076,7 @@ endGame(win) {
 
     rebootGame() {
         audioManager.play('reboot');
-        setTimeout(() => {
-            location.reload();
-        }, 1000); // Wait for sound
+        setTimeout(() => { location.reload(); }, 1000);
     },
 
     updateHUD() {
@@ -1155,35 +1102,74 @@ endGame(win) {
 
     animateAction: function(id, animClass) {
         const el = document.getElementById(id);
-        if(el) {
-            el.classList.remove(animClass);
-            void el.offsetWidth;
-            el.classList.add(animClass);
-        }
+        if(el) { el.classList.remove(animClass); void el.offsetWidth; el.classList.add(animClass); }
     }
 };
 
 document.addEventListener('click', (e) => {
     if (e.target.matches('button, .tag, .option-btn')) {
         const id = e.target.id;
-        const specialIds = ['btn-easy', 'btn-normal', 'btn-hard', 'btn-rehard', 'start-btn', 'short-submit-btn'];
-        if (!specialIds.includes(id)) {
-            audioManager.play('generic');
-        }
+        const specialIds =['btn-easy', 'btn-normal', 'btn-hard', 'btn-rehard', 'start-btn', 'short-submit-btn', 'lang-btn'];
+        if (!specialIds.includes(id)) audioManager.play('generic');
     }
 });
 
-window.onload = function() {
-    audioManager.init();
+function renderTopics() {
     const container = document.getElementById('topic-tags');
+    let selected =[];
+    if (container.children.length > 0) {
+        selected = Array.from(document.querySelectorAll('#topic-tags .tag.selected')).map(t => t.dataset.value);
+    } else {
+        selected = TOPICS_LIST.map(t => t.id); // Default to all selected
+    }
+    container.innerHTML = '';
     TOPICS_LIST.forEach(t => {
         const el = document.createElement('div');
-        el.className = 'tag selected';
+        el.className = 'tag' + (selected.includes(t.id) ? ' selected' : '');
         el.dataset.value = t.id;
-        el.innerText = t.name;
+        el.innerText = t[game.currentLang];
         el.onclick = function() { this.classList.toggle('selected'); };
         container.appendChild(el);
     });
+}
+
+function toggleLang() {
+    game.currentLang = game.currentLang === 'zh' ? 'en' : 'zh';
+    document.getElementById('lang-btn').innerText = game.currentLang === 'zh' ? '🌐 EN' : '🌐 中文';
+    
+    const txt = i18n[game.currentLang];
+    document.getElementById('t-topicTitle').innerText = txt.topicTitle;
+    document.getElementById('btn-toggle-all').innerText = txt.toggleAll;
+    document.getElementById('t-modeTitle').innerText = txt.modeTitle;
+    document.getElementById('t-mcType').innerText = txt.mcType;
+    document.getElementById('t-shortType').innerText = txt.shortType;
+    document.getElementById('t-diffTitle').innerText = txt.diffTitle;
+    document.getElementById('t-levelTitle').innerText = txt.levelTitle;
+    
+    document.getElementById('t-level1').innerText = "1 " + txt.sectorWord;
+    document.getElementById('t-level3').innerText = "3 " + txt.sectorWords;
+    document.getElementById('t-level5').innerText = "5 " + txt.sectorWords;
+    document.getElementById('t-level99').innerText = txt.endlessWord;
+
+    document.getElementById('t-sysReady').innerText = txt.sysReady;
+    document.getElementById('t-sysReadyDesc').innerText = txt.sysReadyDesc;
+
+    document.getElementById('t-hudSector').innerText = txt.hudSector;
+    document.getElementById('t-hudScore').innerText = txt.hudScore;
+    document.getElementById('t-hudChain').innerText = txt.hudChain;
+    document.getElementById('t-firewall').innerText = txt.firewall;
+
+    document.getElementById('t-totalScore').innerText = txt.totalScore;
+    document.getElementById('t-sectorsPassed').innerText = txt.sectorsPassed;
+    document.getElementById('t-debriefTitle').innerHTML = txt.debriefTitle;
+    document.getElementById('t-rebootBtn').innerText = txt.rebootBtn;
+
+    renderTopics();
+}
+
+window.onload = function() {
+    audioManager.init();
+    renderTopics();
 
     ['diff-tags', 'level-tags'].forEach(id => {
         const c = document.getElementById(id);
@@ -1200,9 +1186,7 @@ window.onload = function() {
     document.getElementById('btn-hard').addEventListener('click', () => audioManager.play('hard'));
     document.getElementById('btn-rehard').addEventListener('click', () => audioManager.play('rehard'));
 
-    document.querySelectorAll('#type-tags .tag').forEach(t => {
-        t.onclick = function() { this.classList.toggle('selected'); }
-    });
+    document.querySelectorAll('#type-tags .tag').forEach(t => { t.onclick = function() { this.classList.toggle('selected'); } });
 };
 
 function toggleAllTopics() {
