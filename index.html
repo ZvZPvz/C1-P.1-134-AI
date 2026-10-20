@@ -502,7 +502,7 @@ const audioManager = {
 const API_CONFIG = {
     apiKey: "AIzaSyAd5auMKeXZ7FydoIQdiE0qo06i_foI03M",
     baseUrl: "https://api.335773595.xyz/v1/chat/completions",
-    model: "gemini-3.8-flash",
+    model: "gemini-flash-lite-latest",
     batchSize: 10
 };
 
@@ -1022,22 +1022,18 @@ const game = {
         
         if (total === 0) rank = "D";
         else if (acc === 100) rank = "SSS+";
-        else if (acc >= 97) rank = "SSS";
-        else if (acc >= 94) rank = "SS+";
-        else if (acc >= 90) rank = "SS";
-        else if (acc >= 85) rank = "S+";
-        else if (acc >= 80) rank = "S";
-        else if (acc >= 75) rank = "AAA";
-        else if (acc >= 70) rank = "AA";
-        else if (acc >= 65) rank = "A";
-        else if (acc >= 60) rank = "BBB";
-        else if (acc >= 55) rank = "BB";
-        else if (acc >= 50) rank = "B";
-        else if (acc >= 45) rank = "CCC";
-        else if (acc >= 40) rank = "CC";
-        else if (acc >= 35) rank = "C";
-        else if (acc >= 30) rank = "DDD";
-        else if (acc >= 25) rank = "DD";
+        else if (acc >= 93) rank = "SSS";
+        else if (acc >= 88) rank = "SS+";
+        else if (acc >= 85) rank = "SS";
+        else if (acc >= 80) rank = "S+";
+        else if (acc >= 74) rank = "S";
+        else if (acc >= 70) rank = "AAA";
+        else if (acc >= 63) rank = "AA";
+        else if (acc >= 58) rank = "A";
+        else if (acc >= 48) rank = "BBB";
+        else if (acc >= 40) rank = "BB";
+        else if (acc >= 35) rank = "B";
+        else if (acc >= 30) rank = "C";
         else rank = "D";
 
         let rankColor = "#fff";
